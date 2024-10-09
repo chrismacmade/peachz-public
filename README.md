@@ -1,6 +1,15 @@
 # peachz-public
 Peachz Public Repo For Radar Hackathon: 
 
+**About Peachz**
+
+Peachz is the world's first curated electronic music platform, giving artists a voice, co-ownership, transparency, and fair earnings. Through our Pledge to Play™ model, fans use $Peachz, our Solana-based token (credits), to gamify in-app purchases. Artists can stake their earnings to share in platform profits, building a sustainable, equitable ecosystem.
+
+[Learn More About Peachz](https://go.peachz.xyz/site-radar)
+
+
+---
+
 **During the Hackathon - Peachz Updates**
 
 ---
@@ -29,5 +38,7 @@ Peachz Public Repo For Radar Hackathon:
 - PR releases
 - Collected 2600 potential user emails
 - 20% w-o-w growth
+
+---
 
 🍑 🔥 🚀 LFG!!! 

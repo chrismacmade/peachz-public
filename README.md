@@ -34,6 +34,8 @@ Peachz is the world's first curated electronic music platform, giving artists a 
 - Tokenomics: https://go.peachz.xyz/tokenomics-radar
 - Premliminary Smart Contracts
 
+[Learn More About $Peachz]([https://go.peachz.xyz/site-radar](https://github.com/chrismacmade/peachz-public/blob/main/README.md#overview-of-the-peachz-token-and-its-utility-for-the-future-of-electronic-music))
+
 ---
 
 

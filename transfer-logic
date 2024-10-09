@@ -1,0 +1,65 @@
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Transfer};
+use anchor_lang::solana_program::program::invoke_signed;
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_staking {
+    use super::*;
+
+    // Initialize the staking pool with minimum stake and lock duration
+    pub fn initialize(ctx: Context<Initialize>, min_stake: u64, lock_duration: u64) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        staking_pool.min_stake = min_stake; // Set the minimum stake amount
+        staking_pool.lock_duration = lock_duration; // Set the lock duration for staking
+        staking_pool.total_staked = 0; // Initialize total staked amount
+        staking_pool.profit_sharing_pool = 0; // Initialize profit-sharing pool
+        Ok(())
+    }
+
+    // Function to stake tokens
+    pub fn stake(ctx: Context<Stake>, amount: u64) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        // Check if the staked amount meets the minimum requirement
+        if amount < staking_pool.min_stake {
+            return Err(ProgramError::InvalidArgument);
+        }
+
+        let now = Clock::get()?.unix_timestamp; // Get the current timestamp
+        staker.amount_staked += amount; // Increase the staker's staked amount
+        staker.stake_time = now; // Record the time of staking
+        staker.locked_until = now + staking_pool.lock_duration; // Set the unlock time for staked tokens
+        staking_pool.total_staked += amount; // Update total staked amount
+
+        // Transfer tokens from the staker's account to the staking pool
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.user_token_account.to_account_info(), // User's token account
+            to: ctx.accounts.staking_pool_token_account.to_account_info(), // Staking pool's token account
+            authority: ctx.accounts.user.to_account_info(), // User as the authority
+        };
+        let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+        token::transfer(cpi_ctx, amount)?; // Perform the token transfer
+
+        Ok(())
+    }
+
+    // Function to claim rewards after the staking period
+    pub fn claim_rewards(ctx: Context<ClaimRewards>) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        // Check if the staking period is over
+        if staker.locked_until > Clock::get()?.unix_timestamp {
+            return Err(ProgramError::InvalidArgument); // Tokens are still locked
+        }
+
+        // Calculate the reward based on the staked amount and profit-sharing pool
+        let reward = calculate_rewards(staker.amount_staked, staking_pool.total_staked, staking_pool.profit_sharing_pool);
+        staker.amount_staked = 0; // Reset the staker's balance after claiming rewards
+        staking_pool.profit_sharing_pool -= reward; // Reduce the profit-sharing pool
+
+        // Transfer the claimed reward back to the staker
+     

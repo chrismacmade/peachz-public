@@ -1,0 +1,92 @@
+Functionality:
+- Staking pool for artists.
+- Profit-sharing distribution based on staked amounts.
+- Early withdrawal penalties and compounding options.
+
+---
+
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Token, TokenAccount};
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_staking {
+    use super::*;
+
+    pub fn initialize_staking(ctx: Context<InitializeStaking>) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        staking_pool.total_staked = 0;
+        staking_pool.lock_duration = 180 * 24 * 60 * 60; // 6 months in seconds
+        Ok(())
+    }
+
+    pub fn stake(ctx: Context<Stake>, amount: u64) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        let current_time = Clock::get()?.unix_timestamp;
+        staker.amount_staked += amount;
+        staker.timestamp = current_time;
+        staker.locked_until = current_time + staking_pool.lock_duration;
+        staking_pool.total_staked += amount;
+
+        // Transfer tokens from the staker's account to the staking pool
+        let cpi_accounts = token::Transfer {
+            from: ctx.accounts.user_token_account.to_account_info(),
+            to: ctx.accounts.staking_pool_token_account.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(),
+        };
+        token::transfer(cpi_accounts, amount)?;
+
+        Ok(())
+    }
+
+    pub fn unstake(ctx: Context<Unstake>) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        let current_time = Clock::get()?.unix_timestamp;
+        require!(current_time >= staker.locked_until, CustomError::TokensStillLocked);
+
+        // Handle penalties and unstaking logic here
+        let amount_to_unstake = staker.amount_staked;
+        staking_pool.total_staked -= amount_to_unstake;
+
+        // Transfer tokens back to the staker
+        let cpi_accounts = token::Transfer {
+            from: ctx.accounts.staking_pool_token_account.to_account_info(),
+            to: ctx.accounts.user_token_account.to_account_info(),
+            authority: ctx.accounts.staking_pool.to_account_info(),
+        };
+        token::transfer(cpi_accounts, amount_to_unstake)?;
+
+        // Reset staker's data
+        staker.amount_staked = 0;
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct InitializeStaking<'info> {
+    #[account(init, payer = user, space = 8 + std::mem::size_of::<StakingPool>())]
+    pub staking_pool: Account<'info, StakingPool>,
+    #[account(init, payer = user, token::mint = mint)]
+    pub staking_pool_token_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct StakingPool {
+    pub total_staked: u64,
+    pub lock_duration: i64,
+}
+
+#[account]
+pub struct Staker {
+    pub amount_staked: u64,
+    pub timestamp: i64,
+    pub locked_until: i64,
+}

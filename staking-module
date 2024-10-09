@@ -1,0 +1,143 @@
+use anchor_lang::prelude::*;
+use anchor_lang::solana_program::pubkey::Pubkey;
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_staking {
+    use super::*;
+
+    pub fn initialize(ctx: Context<Initialize>, min_stake: u64, lock_duration: u64) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        staking_pool.min_stake = min_stake;
+        staking_pool.lock_duration = lock_duration;
+        staking_pool.total_staked = 0;
+        staking_pool.profit_sharing_pool = 0;
+        Ok(())
+    }
+
+    pub fn stake(ctx: Context<Stake>, amount: u64) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        if amount < staking_pool.min_stake {
+            return Err(ProgramError::InvalidArgument);
+        }
+
+        let now = Clock::get()?.unix_timestamp;
+        staker.amount_staked += amount;
+        staker.stake_time = now;
+        staker.locked_until = now + staking_pool.lock_duration;
+        staking_pool.total_staked += amount;
+
+        // Transfer tokens from staker to the staking pool
+        // Assume the transfer logic is implemented elsewhere
+        // transfer_tokens(&ctx.accounts.token_program, &ctx.accounts.staker, &ctx.accounts.staking_pool, amount)?;
+
+        Ok(())
+    }
+
+    pub fn claim_rewards(ctx: Context<ClaimRewards>) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        if staker.locked_until > Clock::get()?.unix_timestamp {
+            return Err(ProgramError::InvalidArgument); // Tokens are still locked
+        }
+
+        let reward = calculate_rewards(staker.amount_staked, staking_pool.total_staked, staking_pool.profit_sharing_pool);
+        staker.amount_staked = 0; // Reset the staker's balance after claiming rewards
+        staking_pool.profit_sharing_pool -= reward; // Reduce the profit-sharing pool
+
+        // Assume the transfer logic is implemented elsewhere
+        // transfer_tokens(&ctx.accounts.token_program, &ctx.accounts.staker, &reward, amount)?;
+
+        Ok(())
+    }
+
+    pub fn unstake(ctx: Context<Unstake>) -> ProgramResult {
+        let staking_pool = &mut ctx.accounts.staking_pool;
+        let staker = &mut ctx.accounts.staker;
+
+        if staker.locked_until > Clock::get()?.unix_timestamp {
+            return Err(ProgramError::InvalidArgument); // Tokens are still locked
+        }
+
+        // Implement early unstaking penalties
+        let penalty = if staker.stake_time + staking_pool.lock_duration > Clock::get()?.unix_timestamp {
+            (staker.amount_staked as f64 * 0.1) as u64 // 10% penalty
+        } else {
+            0
+        };
+
+        let amount_to_unstake = staker.amount_staked - penalty;
+        staking_pool.total_staked -= staker.amount_staked;
+
+        staker.amount_staked = 0; // Reset the staker's balance
+
+        // Assume the transfer logic is implemented elsewhere
+        // transfer_tokens(&ctx.accounts.token_program, &ctx.accounts.staker, &amount_to_unstake)?;
+
+        Ok(())
+    }
+
+    fn calculate_rewards(amount_staked: u64, total_staked: u64, profit_sharing_pool: u64) -> u64 {
+        if total_staked == 0 {
+            return 0; // Avoid division by zero
+        }
+        profit_sharing_pool * amount_staked / total_staked
+    }
+}
+
+#[account]
+pub struct StakingPool {
+    pub min_stake: u64,
+    pub lock_duration: u64,
+    pub total_staked: u64,
+    pub profit_sharing_pool: u64,
+}
+
+#[account]
+pub struct Staker {
+    pub amount_staked: u64,
+    pub stake_time: i64,
+    pub locked_until: i64,
+}
+
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(init, payer = user, space = 8 + std::mem::size_of::<StakingPool>())]
+    pub staking_pool: Account<'info, StakingPool>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct Stake<'info> {
+    #[account(mut)]
+    pub staking_pool: Account<'info, StakingPool>,
+    #[account(mut)]
+    pub staker: Account<'info, Staker>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+pub struct ClaimRewards<'info> {
+    #[account(mut)]
+    pub staking_pool: Account<'info, StakingPool>,
+    #[account(mut)]
+    pub staker: Account<'info, Staker>,
+    pub user: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct Unstake<'info> {
+    #[account(mut)]
+    pub staking_pool: Account<'info, StakingPool>,
+    #[account(mut)]
+    pub staker: Account<'info, Staker>,
+    pub user: Signer<'info>,
+}

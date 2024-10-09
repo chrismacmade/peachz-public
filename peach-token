@@ -1,0 +1,40 @@
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Mint, Token, TokenAccount};
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_token {
+    use super::*;
+
+    pub fn initialize(ctx: Context<Initialize>, initial_supply: u64) -> ProgramResult {
+        let mint = &mut ctx.accounts.mint;
+        let cpi_accounts = token::InitializeMint {
+            mint: mint.to_account_info(),
+            rent: ctx.accounts.rent.to_account_info(),
+        };
+        token::initialize_mint(cpi_accounts, 9, &ctx.accounts.owner.key(), None)?;
+
+        // Mint initial supply to the owner
+        let cpi_accounts = token::MintTo {
+            mint: mint.to_account_info(),
+            to: ctx.accounts.token_account.to_account_info(),
+            authority: ctx.accounts.owner.to_account_info(),
+        };
+        token::mint_to(cpi_accounts, initial_supply)?;
+
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(init, payer = owner, space = 8 + std::mem::size_of::<Mint>())]
+    pub mint: Account<'info, Mint>,
+    #[account(init, payer = owner, token::mint = mint)]
+    pub token_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+}

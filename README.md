@@ -76,5 +76,5 @@ As the electronic music industry continues to evolve, Peachz is positioning itse
 
 The $PEACHZ token represents a new era of ownership, fairness, and innovation in the music industry. It allows artists to take control of their careers, fans to directly support the creators they love, and investors to back a sustainable, decentralized ecosystem. As Peachz grows, the value of $PEACHZ is intrinsically tied to the platform’s success, making it a key player in the future of electronic music.
 
-This is more than just a token; it’s a tool for redefining how we experience, create, and support music in the digital age.
+This is more than just a token; it’s a tool for redefining how we experience, create, and support music on the new Internet.
 

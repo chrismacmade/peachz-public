@@ -43,7 +43,6 @@ Peachz is the world's first curated electronic music platform, giving artists a 
 - Collected 2600 potential user emails
 - 20% w-o-w growth
 
----
 
 🍑 🔥 🚀 LFG!!! 
 

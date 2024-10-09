@@ -1,0 +1,25 @@
+Functionality:
+- Distribute profits to stakers based on staking amounts.
+---
+
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Token, TokenAccount};
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_profit_sharing {
+    use super::*;
+
+    pub fn distribute_profits(ctx: Context<DistributeProfits>, amount: u64) -> ProgramResult {
+        // Logic to distribute profits based on stakes
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct DistributeProfits<'info> {
+    #[account(mut)]
+    pub profit_pool_account: Account<'info, TokenAccount>, // Account for profit distribution
+    pub token_program: Program<'info, Token>,
+}

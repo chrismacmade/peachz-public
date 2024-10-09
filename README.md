@@ -67,7 +67,7 @@ Every transaction on the platform includes a $0.25 fee used to buy back $PEACHZ 
 The $PEACHZ token is a way to directly reward artists and early adopters who contribute to the platform's growth. Whether through staking, voting, or providing feedback, active participants in the Peachz ecosystem are given opportunities to grow alongside the platform, ensuring that artists and fans benefit together.
 
 ### Platform Expansion and Innovation:
-$PEACHZ will fuel the development of innovative features on the platform, such as virtual events, premium artist content, and future collaborations. As Peachz expands into new regions and genres, token holders stand to benefit from the growth, with their stakes in the platform increasing in value as the ecosystem scales globally.
+$PEACHZ will fuel the development of innovative features on the platform, such as IRL & virtual events, premium artist content, and future collaborations. As Peachz expands into new regions and genres, token holders stand to benefit from the growth, with their stakes in the platform increasing in value as the ecosystem scales globally.
 
 ## The Future of Electronic Music:
 As the electronic music industry continues to evolve, Peachz is positioning itself at the forefront of this transformation. By leveraging blockchain technology and the $PEACHZ token, Peachz is creating a decentralized, artist-first platform that solves many of the problems faced by independent electronic music creators today—such as low payouts, lack of control, and limited fan engagement.

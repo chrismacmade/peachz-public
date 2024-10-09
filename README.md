@@ -72,7 +72,7 @@ The $PEACHZ token is a way to directly reward artists and early adopters who con
 $PEACHZ will fuel the development of innovative features on the platform, such as IRL & virtual events, premium artist content, and future collaborations. As Peachz expands into new regions and genres, token holders stand to benefit from the growth, with their stakes in the platform increasing in value as the ecosystem scales globally.
 
 ## The Future of Electronic Music:
-As the electronic music industry continues to evolve, Peachz is positioning itself at the forefront of this transformation. By leveraging blockchain technology and the $PEACHZ token, Peachz is creating a decentralized, artist-first platform that solves many of the problems faced by independent electronic music creators today—such as low payouts, lack of control, and limited fan engagement.
+As the electronic music industry continues to evolve, Peachz is positioning itself at the forefront of this transformation. By leveraging Solana blockchain technology and the $PEACHZ token, Peachz is creating a decentralized, artist-first platform that solves many of the problems faced by independent electronic music creators today—such as low payouts, lack of control, and limited fan engagement.
 
 The $PEACHZ token represents a new era of ownership, fairness, and innovation in the music industry. It allows artists to take control of their careers, fans to directly support the creators they love, and investors to back a sustainable, decentralized ecosystem. As Peachz grows, the value of $PEACHZ is intrinsically tied to the platform’s success, making it a key player in the future of electronic music.
 

@@ -29,6 +29,7 @@ Peachz is the world's first curated electronic music platform, giving artists a 
 
 **2. $PEACHZ**
 
+- Premliminary Smart Contracts
 - Paper: Twitter DM for more info: https://x.com/peachz_xyz
 - Roadmap: https://go.peachz.xyz/roadmap-radar
 - Tokenomics: https://go.peachz.xyz/tokenomics-radar

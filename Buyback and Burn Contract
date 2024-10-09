@@ -1,0 +1,36 @@
+Functionality:
+- Handle transaction fees for buyback and burn of $PEACHZ tokens.
+---
+
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Token, TokenAccount};
+
+declare_id!("YourProgramIdHere");
+
+#[program]
+pub mod peachz_buyback {
+    use super::*;
+
+    pub fn buyback(ctx: Context<Buyback>, amount: u64) -> ProgramResult {
+        // Logic to buy back tokens and burn them
+        let cpi_accounts = token::Transfer {
+            from: ctx.accounts.fee_account.to_account_info(),
+            to: ctx.accounts.buyback_account.to_account_info(),
+            authority: ctx.accounts.fee_authority.to_account_info(),
+        };
+        token::transfer(cpi_accounts, amount)?;
+        // Burn tokens logic here
+        Ok(())
+    }
+}
+
+#[derive(Accounts)]
+pub struct Buyback<'info> {
+    #[account(mut)]
+    pub fee_account: Account<'info, TokenAccount>, // Account holding fees
+    #[account(mut)]
+    pub buyback_account: Account<'info, TokenAccount>, // Account for buybacks
+    #[account(mut)]
+    pub fee_authority: Signer<'info>, // Authority to manage fees
+    pub token_program: Program<'info, Token>,
+}
